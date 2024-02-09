@@ -1,0 +1,52 @@
+name: Main
+
+on:
+  push:
+    branches: [ "main" ]
+  # pull_request:
+  #   branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: addyandbrendan
+  
+    steps:
+    # - uses: actions/checkout@v3
+    # - name: Copy config directory to bot and api directories
+    #   run: |
+    #     set -e
+    #     cp -r ./config ./bot/
+    #     cp -r ./config ./api/
+    #     cp -r ./config ./website/
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: |
+        set -e
+        docker build --tag nb-site ./website
+
+  deploy:
+
+    runs-on: addyandbrendan
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Launch docker containers
+        run: |
+          set -e
+          echo "Starting the docker containers"
+          docker rm -f website && docker run -d --restart always --net host --name website nb-site
+          sleep 8
+            failed_services=$(docker ps | grep Restarting | awk '{ print $NF }')
+            for service in ${failed_services}
+          do
+            echo ""
+            echo "${service} service failed to start properly:"
+            echo ""
+            docker logs $service
+          done
+          if [ -n "$failed_services" ]; then exit 1; fi
+
+    
