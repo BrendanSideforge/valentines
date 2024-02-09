@@ -25,6 +25,7 @@ jobs:
       run: |
         set -e
         docker build --tag nb-site ./website
+        docker build --tag nb-proxy ./proxy
 
   deploy:
 
@@ -38,6 +39,7 @@ jobs:
           set -e
           echo "Starting the docker containers"
           docker rm -f website && docker run -d --restart always --net host --name website nb-site
+          docker rm -f proxy && docker run -d --restart always --net host --name proxy nb-proxy
           sleep 8
             failed_services=$(docker ps | grep Restarting | awk '{ print $NF }')
             for service in ${failed_services}
