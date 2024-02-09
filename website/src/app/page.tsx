@@ -20,7 +20,7 @@ export default function Home() {
           
         : <></>}
 
-        { clicked && answer ? <p className="answer-response">Wow you were nice, that's surprising</p> : <></>}
+        { clicked && answer ? <p className="answer-response">Wow you were nice, that&apos;s surprising</p> : <></>}
 
         <div className="flex">
           <button onClick={ () => { setClicked(true); setAnswer(false) } }>No</button>
